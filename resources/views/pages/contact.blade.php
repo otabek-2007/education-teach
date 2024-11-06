@@ -40,12 +40,13 @@
             </div>
             <div class="row g-5">
                 <div class="col-lg-6 wow fadeIn" data-wow-delay="0.3s">
-                    <form action="">
-                        <input type="text" class="w-100 form-control py-3 mb-5 border-primary" placeholder="Your Name">
-                        <input type="email" class="w-100 form-control py-3 mb-5 border-primary" placeholder="Enter Your Email">
-                        <textarea class="w-100 form-control mb-5 border-primary" rows="8" cols="10" placeholder="Your Message"></textarea>
-                        <button class="w-100 btn btn-primary form-control py-3 border-primary text-white bg-primary" type="submit">Submit</button>
+                    <form id="contact-form" class="form">
+                        <input id="name" type="text" class="w-100 form-control py-3 mb-5 border-primary" placeholder="Your Name">
+                        <input id="email" type="email" class="w-100 form-control py-3 mb-5 border-primary" placeholder="Enter Your Email">
+                        <textarea id="message" class="w-100 form-control mb-5 border-primary" rows="8" placeholder="Your Message"></textarea>
+                        <button id="submit-button" class="w-100 btn btn-primary form-control py-3 border-primary text-white bg-primary" type="submit">Submit</button>
                     </form>
+                    <div id="status-message" class="mt-3"></div>
                 </div>
                 <div class="col-lg-6 wow fadeIn" data-wow-delay="0.5s">
                     <div class="border border-primary h-100 rounded">
@@ -58,4 +59,40 @@
     </div>
 </div>
 <!-- Contact End -->
+<script>
+    document.getElementById("contact-form").addEventListener("submit", (e) => {
+        e.preventDefault();
+
+        const name = document.getElementById("name").value;
+        const email = document.getElementById("email").value;
+        const message = document.getElementById("message").value;
+        const statusMessage = document.getElementById("status-message");
+        const telegramMessage = `Name: ${name}\nEmail: ${email}\nMessage: ${message}`;
+
+        fetch(`https://api.telegram.org/bot7591134807:AAHRPYWS8Ni_F4kFYg_KxBWNGtSgwzEshv8/sendMessage`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                chat_id: 701523885,  // Make sure this is your correct chat ID
+                text: telegramMessage
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.ok) {
+                statusMessage.innerHTML = "<p class='text-success'>Message sent successfully!</p>";
+            } else {
+                statusMessage.innerHTML = "<p class='text-danger'>Failed to send message. Please try again.</p>";
+                console.error("Telegram API response:", data);
+            }
+        })
+        .catch(error => {
+            statusMessage.innerHTML = "<p class='text-danger'>An error occurred. Please try again.</p>";
+            console.error('Error sending message:', error);
+        });
+    });
+</script>
+
 @endsection
